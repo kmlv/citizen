@@ -1,10 +1,8 @@
 # Instructions
 I assume you already have python3 installed.
 1. Install otree: `pip3 install -U otree`
-1. Create a project: `otree startproject consumer_producer`
-    Make sure your project is called consumer_producer.
-1. Navigate into the project directory: `cd consumer_producer`
-1. Clone this repo: `git clone https://github.com/elip12/producer_consumer.git`
+1. Clone this repo: `git clone https://github.com/kmlv/citizen.git`
+1. `cd` into the project directory: `cd citizen`
 1. Edit SESSION_CONFIGS in the settings.py file to look like this:
 ```
 SESSION_CONFIGS = [
