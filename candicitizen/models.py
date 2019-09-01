@@ -51,14 +51,12 @@ class Player(BasePlayer):
     ]) # whether or not you entered the race
     preference = models.IntegerField() # The number your vote was cast for
     preference2 = models.IntegerField() # In case of a tie, the second number
-    # set payoffs
     
     def set_payoffs(self):
-        if self.candidate_number == self.session.vars['winner']
-            self.payoff += Constants.B
         if self.ran:
             self.payoff -= Constants.C
             if self.candidate_number in self.session.vars['nominees'] and \
                 self.session.vars['second_round']:
                 self.payoff -= Constants.D
-
+            if self.candidate_number == self.session.vars['winner']:
+                self.payoff += Constants.B

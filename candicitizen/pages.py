@@ -60,7 +60,7 @@ class ResultsWaitPage(WaitPage):
             self.session.vars['nominees'] = random.sample(
                 Constants.preferences, 2)
         # special case: no one runs
-        elif len(self.sesion.vars['ran']) == 0:
+        elif len(self.session.vars['ran']) == 0:
             self.session.vars['nominees'] = random.sample(
                 Constants.preferences, 1)
         # 2-4 people run 
@@ -76,7 +76,7 @@ class ResultsWaitPage(WaitPage):
         
         # Determine winner
         # 1 nominee
-        if len(self.session.vars['nominess'] == 1:
+        if len(self.session.vars['nominees']) == 1:
             self.session.vars['winner'] = self.session.vars['nominees'][0]
         # 2 nominees and second round
         elif len(self.session.vars['nominees']) > 1 and Constants.second_round:
