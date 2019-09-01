@@ -21,5 +21,4 @@ SESSION_CONFIGS = [
  This is a prototype; not all features of the game have been implemented.
 
  Features not yet implemented:
-    - payoffs
     - config file
