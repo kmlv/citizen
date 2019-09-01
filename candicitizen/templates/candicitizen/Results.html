@@ -5,8 +5,8 @@
     <script type="text/javascript">
       window.onload = function () 
       {
-        document.getElementById("won_first_").value = "{{ won_first }}";
-        document.getElementById("won_second_").value = "{{ won_second }}";
+        document.getElementById("nominees_").value = "{{ nominees }}";
+        document.getElementById("winner_").value = "{{ winner }}";
         document.getElementById("ran_").value = "{{ ran }}";
         document.getElementById("second_round_").value = "{{ second_round }}";
       }
@@ -20,8 +20,8 @@
 {% block content %}
 
     {{ form.errors }}
-    <input type="hidden" name="won_first" id="won_first_"/>
-    <input type="hidden" name="won_second" id="won_second_"/>
+    <input type="hidden" name="nominees" id="nominees_"/>
+    <input type="hidden" name="winner" id="winner_"/>
     <input type="hidden" name="ran" id="ran_"/>
     <input type="hidden" name="second_round" id="second_round_"/>
 
@@ -30,15 +30,15 @@
         <br>
         Candidates who ran: {{ ran }}.
         <br>
-        Winner(s) of the first round of voting: {{ won_first }}.
+        Winner(s) of the first round of voting: {{ Nominees }}.
         <br>
-        {% if second_round and Constants.second_round %}
+        {% if second_round %}
         There was a tie, and voting progressed to the second round.
         <br>
-        Winner of the second round: {{ won_second }}.
+        Winner of the second round: {{ winner }}.
         <br>
         {% endif %}
-        Your payoff this round: TODO.
+        Your payoff this round: {{ player.payoff|c }}.
     </p>
 
     {% next_button %}

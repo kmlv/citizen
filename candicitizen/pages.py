@@ -3,6 +3,10 @@ from ._builtin import Page, WaitPage
 from .models import Constants
 import collections, random
 
+class Introduction(Page):
+    def is_displayed(self):
+        return self.round_number == 1
+
 class Voting(Page):
     form_model = 'player'
     form_fields = ['ran', 'preference', 'preference2']
@@ -15,6 +19,7 @@ class Voting(Page):
     timeout_seconds = 30
 
     def before_next_page(self):
+        # each player votes
         if self.timeout_happened:
             self.player.ran = False
         if self.player.ran:
@@ -35,43 +40,53 @@ class Voting(Page):
 
 class ResultsWaitPage(WaitPage):
     def after_all_players_arrive(self):
-        # record who ran and count the votes
-        votes = collections.Counter()
-        self.session.vars['ran'] = []
-        self.session.vars['second_round'] = False
-        self.session.vars['won_second'] = None
+        votes = collections.Counter() # data structure for holding votes
+        self.session.vars['ran'] = [] # list storing who ran
+        self.session.vars['nominees'] = [] # list storing winners of first round
+        self.session.vars['second_round'] = False # boolean storing whether a second_round occurred
+        self.session.vars['winner'] = None # candidate_number of the winner
+        
+        # record who ran and count votes
         for p in self.group.get_players():
             if p.ran:
                 self.session.vars['ran'].append(p.candidate_number)
             votes[p.preference] += 1
             if p.preference2:
                 votes[p.preference2] += 1
-        # special case: everyone or no one runs
-        if len(self.session.vars['ran']) == Constants.players_per_group \
-            or len(self.session.vars['ran']) == 0:
-            self.session.vars['won_first'] = random.sample(
+        
+        # Create list of nominees
+        # special case: everyone runs
+        if len(self.session.vars['ran']) == Constants.players_per_group:
+            self.session.vars['nominees'] = random.sample(
                 Constants.preferences, 2)
+        # special case: no one runs
+        elif len(self.sesion.vars['ran']) == 0:
+            self.session.vars['nominees'] = random.sample(
+                Constants.preferences, 1)
+        # 2-4 people run 
         else:
-            # record the winner(s)
             first, second = votes.most_common(2)
-            self.session.vars['won_first'] = []
             for p in self.group.get_players():
                 if p.candidate_number == first[0]:
-                    self.session.vars['won_first'].append(p.candidate_number)
+                    self.session.vars['nominees'].append(p.candidate_number)
             if first[1] == second[1]:
-                self.session.vars['second_round'] = True
                 for p in self.group.get_players():
                     if p.candidate_number == second[0]:
-                        self.session.vars['won_first'].append(p.candidate_number)       
-        # implement the second round
-        if self.session.vars['second_round'] and Constants.second_round:
+                        self.session.vars['nominees'].append(p.candidate_number)       
+        
+        # Determine winner
+        # 1 nominee
+        if len(self.session.vars['nominess'] == 1:
+            self.session.vars['winner'] = self.session.vars['nominees'][0]
+        # 2 nominees and second round
+        elif len(self.session.vars['nominees']) > 1 and Constants.second_round:
             votes2 = collections.Counter()
             # each player votes again
             for p in self.group.get_players():
-                if p.candidate_number in self.session.vars['won_first']:
+                if p.candidate_number in self.session.vars['nominees']:
                     votes2[p.candidate_number] += 1
                 else:
-                    w = self.session.vars['won_first']
+                    w = self.session.vars['nominees']
                     d = []
                     d.append((w[0], abs(p.candidate_number - w[0])))
                     d.append((w[1], abs(p.candidate_number - w[1])))
@@ -81,22 +96,29 @@ class ResultsWaitPage(WaitPage):
                         votes2[choice] += 1
                     else:
                         votes2[d[0][0]] += 1
-            self.session.vars['won_second'] = votes2.most_common(1)[0][0]
+            self.session.vars['winner'] = votes2.most_common(1)[0][0]
+            self.session.vars['second_round'] = True
+        # 2 nominees, no second round
+        else:
+            self.session.vars['winner'] = random.choice(
+                self.session.vars['nominees'])
 
 class Results(Page):
     timeout_seconds = 30
     form_model = 'group'
-    form_fields = ['won_first', 'won_second', 'ran', 'second_round']
+    form_fields = ['nominees', 'winner', 'ran', 'second_round']
  
     def vars_for_template(self):
+        self.player.set_payoffs()
         return {
-            'won_first': str(self.session.vars['won_first']),
-            'won_second': self.session.vars['won_second'],
+            'nominees': str(self.session.vars['nominees']),
+            'winner': self.session.vars['winner'],
             'ran': str(self.session.vars['ran']),
-            'second_round': self.session.vars['second_round']
+            'second_round': self.session.vars['second_round'],
         }
 
 page_sequence = [
+    Introduction,
     Voting,
     ResultsWaitPage,
     Results
