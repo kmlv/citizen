@@ -1,0 +1,19 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Final Results
+{% endblock %}
+
+{% block content %}
+
+    <p>
+        Your final wealth: {{ player.participant.payoff|c }}.
+        <br>
+        Your payoff (the money you will earn from this experiment): {{ payout }}
+    </p>
+
+    {% next_button %}
+{% endblock %}
+
+

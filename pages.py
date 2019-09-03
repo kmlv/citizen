@@ -117,9 +117,21 @@ class Results(Page):
             'second_round': self.session.vars['second_round'],
         }
 
+class FinalResults(Page):
+    def is_displayed(self):
+        return self.round_number == Constants.num_rounds
+
+    def vars_for_template(self):
+        chosen_round = random.randint(1, 10)
+        payout = self.player.in_round(chosen_round).payoff
+        return {
+            'payout': payout,
+        }
+
 page_sequence = [
     Introduction,
     Voting,
     ResultsWaitPage,
-    Results
+    Results,
+    FinalResults,
 ]
