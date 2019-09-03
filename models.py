@@ -13,20 +13,16 @@ Your app description
 
 class Constants(BaseConstants):
     name_in_url = 'candicitizen'
-    num_rounds = 5 # multiples of 5
+    num_rounds = 10 # multiples of 5
     players_per_group = 5
     preferences = [15, 30, 50, 70, 95]
-    # The following will be moved to a separate config file
-    B = 10 # prize for being elected
-    C = 10 # cost for running in the first round
-    D = 10 # cost for running in the second round
     endowment = c(100) # initial endowment for each player
-    second_round = True # whether there will be a second round of voting or not
 
 class Subsession(BaseSubsession):
     def creating_session(self):
         if self.round_number == 1:
             self.group_randomly()
+            self.participant.payoff += Constants.endowment
         else:
             self.group_like_round(1)
         for p in self.get_players():
@@ -35,7 +31,10 @@ class Subsession(BaseSubsession):
             # distance to each other for this given round
             p.participant.vars['distances'] = {d:
                 abs(p.candidate_number - d) for d in Constants.preferences}
-
+        if self.round_number > 5:
+            self.session.vars['second_round_toggle'] = True
+        else:
+            self.session.vars['second_round_toggle'] = False
 
 class Group(BaseGroup):
     ran = models.StringField()
@@ -54,9 +53,9 @@ class Player(BasePlayer):
     
     def set_payoffs(self):
         if self.ran:
-            self.payoff -= Constants.C
+            self.payoff -= self.session.config['C']
             if self.candidate_number in self.session.vars['nominees'] and \
                 self.session.vars['second_round']:
-                self.payoff -= Constants.D
+                self.payoff -= self.session.config['D']
             if self.candidate_number == self.session.vars['winner']:
-                self.payoff += Constants.B
+                self.payoff += self.session.config['B']

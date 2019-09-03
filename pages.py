@@ -32,7 +32,7 @@ class Voting(Page):
             second_closest = min(d.items(), key=lambda x: x[1])
             self.player.preference = closest[0]
             self.player.preference2 = None
-            if closest[1] == second_closest[1] and Constants.second_round:
+            if closest[1] == second_closest[1] and self.session.config['second_round_toggle']:
                 self.player.preference2 = second_closest[0]
             elif closest[1] == second_closest[1]:
                 if random.random() < 0.5:
@@ -79,7 +79,7 @@ class ResultsWaitPage(WaitPage):
         if len(self.session.vars['nominees']) == 1:
             self.session.vars['winner'] = self.session.vars['nominees'][0]
         # 2 nominees and second round
-        elif len(self.session.vars['nominees']) > 1 and Constants.second_round:
+        elif len(self.session.vars['nominees']) > 1 and self.session.vars['second_round_toggle']:
             votes2 = collections.Counter()
             # each player votes again
             for p in self.group.get_players():
