@@ -39,6 +39,8 @@
         <br>
         {% endif %}
         Your payoff this round: {{ player.payoff|c }}.
+        <br>
+        Your wealth: {{ player.participant.payoff|c }}.
     </p>
 
     {% next_button %}
