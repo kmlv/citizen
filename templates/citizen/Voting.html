@@ -1,26 +1,11 @@
 {% extends "global/Page.html" %}
 {% load otree static %}
 
-{% block scripts %}
-    <script type="text/javascript">
-      window.onload = function () 
-      {
-        document.getElementById("preference_").value = 0;
-        document.getElementById("preference2_").value = 0;
-      }
-    </script>
-{% endblock %}
-
 {% block title %}
     Voting: Round {{ subsession.round_number }}
 {% endblock %}
 
 {% block content %}
-
-    {{ form.errors }}
-    <input type="hidden" name="preference" id="preference_"/>
-    <input type="hidden" name="preference2" id="preference2_"/>
-
     <p>
         These are some instructions.
         <br>
@@ -29,9 +14,6 @@
         Would you like to run in the election?
         <br>
     </p>
-
     {% formfield player.ran %}
-    
     {% next_button %}
-
 {% endblock %}

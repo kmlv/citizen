@@ -1,32 +1,11 @@
 {% extends "global/Page.html" %}
 {% load otree static %}
 
-{% block scripts %}
-    <script type="text/javascript">
-      window.onload = function () 
-      {
-        document.getElementById("nominees_").value = "{{ nominees }}";
-        document.getElementById("winner_").value = "{{ winner }}";
-        document.getElementById("ran_").value = "{{ ran }}";
-        document.getElementById("second_round_").value = "{{ second_round }}";
-        document.getELementById("round_payoff_").value = "{{ round_payoff }}";
-      }
-    </script>
-{% endblock %}
-
 {% block title %}
     Results: Round {{ subsession.round_number }}
 {% endblock %}
 
 {% block content %}
-
-    {{ form.errors }}
-    <input type="hidden" name="nominees" id="nominees_"/>
-    <input type="hidden" name="winner" id="winner_"/>
-    <input type="hidden" name="ran" id="ran_"/>
-    <input type="hidden" name="second_round" id="second_round_"/>
-    <input type="hidden" name="round_payoff" id="round_payoff_"/>
-
     <p>
         The results are in!
         <br>
@@ -43,8 +22,6 @@
         Your payoff this round: {{ round_payoff|c }}.
         <br>
     </p>
-
     {% next_button %}
 {% endblock %}
-
 

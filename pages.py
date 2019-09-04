@@ -9,7 +9,7 @@ class Introduction(Page):
 
 class Voting(Page):
     form_model = 'player'
-    form_fields = ['ran', 'preference', 'preference2']
+    form_fields = ['ran']
 
     def vars_for_template(self):
         return {
@@ -25,14 +25,14 @@ class Voting(Page):
         if self.player.ran:
             self.player.preference = self.player.candidate_number
         else:
-            d = self.player.participant.vars['distances']
+            d = self.player.participant.vars['distances'].copy()
             del d[self.player.candidate_number]
             closest = min(d.items(), key=lambda x: x[1])
             del d[closest[0]]
             second_closest = min(d.items(), key=lambda x: x[1])
             self.player.preference = closest[0]
             self.player.preference2 = None
-            if closest[1] == second_closest[1] and self.session.config['second_round_toggle']:
+            if closest[1] == second_closest[1] and self.session.vars['second_round_toggle']:
                 self.player.preference2 = second_closest[0]
             elif closest[1] == second_closest[1]:
                 if random.random() < 0.5:
@@ -105,8 +105,6 @@ class ResultsWaitPage(WaitPage):
 
 class Results(Page):
     timeout_seconds = 30
-    form_model = 'group'
-    form_fields = ['nominees', 'winner', 'ran', 'second_round', 'round_payoff']
  
     def vars_for_template(self):
         round_payoff = self.session.config['endowment']
@@ -117,6 +115,12 @@ class Results(Page):
                 round_payoff -= self.session.config['D']
             if self.player.candidate_number == self.session.vars['winner']:
                 round_payoff += self.session.config['B']
+        self.player.round_payoff = round_payoff
+        if self.player.id_in_group == 1:
+            self.group.nominees = str(self.session.vars['nominees'])
+            self.group.winner = str(self.session.vars['winner'])
+            self.group.ran = str(self.session.vars['ran'])
+            self.group.second_round = self.session.vars['second_round']
         if self.round_number == self.player.participant.vars['paying_round']:
             self.player.set_payoffs(round_payoff) 
         return {
