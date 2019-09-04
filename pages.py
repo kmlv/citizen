@@ -106,15 +106,25 @@ class ResultsWaitPage(WaitPage):
 class Results(Page):
     timeout_seconds = 30
     form_model = 'group'
-    form_fields = ['nominees', 'winner', 'ran', 'second_round']
+    form_fields = ['nominees', 'winner', 'ran', 'second_round', 'round_payoff']
  
     def vars_for_template(self):
-        self.player.set_payoffs()
+        round_payoff = self.session.config['endowment']
+        if self.player.ran:
+            round_payoff -= self.session.config['C']
+            if self.player.candidate_number in self.session.vars['nominees'] and \
+                self.session.vars['second_round']:
+                round_payoff -= self.session.config['D']
+            if self.player.candidate_number == self.session.vars['winner']:
+                round_payoff += self.session.config['B']
+        if self.round_number == self.player.participant.vars['paying_round']:
+            self.player.set_payoffs(round_payoff) 
         return {
             'nominees': str(self.session.vars['nominees']),
             'winner': self.session.vars['winner'],
             'ran': str(self.session.vars['ran']),
             'second_round': self.session.vars['second_round'],
+            'round_payoff': round_payoff
         }
 
 class FinalResults(Page):
@@ -122,9 +132,10 @@ class FinalResults(Page):
         return self.round_number == Constants.num_rounds
 
     def vars_for_template(self):
-        chosen_round = random.randint(1, 10)
+        chosen_round = self.player.participant.vars['paying_round']
         payout = self.player.in_round(chosen_round).payoff
         return {
+            'chosen_round': chosen_round,
             'payout': payout,
         }
 

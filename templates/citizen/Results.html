@@ -9,6 +9,7 @@
         document.getElementById("winner_").value = "{{ winner }}";
         document.getElementById("ran_").value = "{{ ran }}";
         document.getElementById("second_round_").value = "{{ second_round }}";
+        document.getELementById("round_payoff_").value = "{{ round_payoff }}";
       }
     </script>
 {% endblock %}
@@ -24,6 +25,7 @@
     <input type="hidden" name="winner" id="winner_"/>
     <input type="hidden" name="ran" id="ran_"/>
     <input type="hidden" name="second_round" id="second_round_"/>
+    <input type="hidden" name="round_payoff" id="round_payoff_"/>
 
     <p>
         The results are in!
@@ -38,9 +40,8 @@
         Winner of the second round: {{ winner }}.
         <br>
         {% endif %}
-        Your payoff this round: {{ player.payoff|c }}.
+        Your payoff this round: {{ round_payoff|c }}.
         <br>
-        Your wealth: {{ player.participant.payoff|c }}.
     </p>
 
     {% next_button %}

@@ -8,9 +8,9 @@
 {% block content %}
 
     <p>
-        Your final wealth: {{ player.participant.payoff|c }}.
+        Your randomly chosen paying round: {{ chosen_round }}.
         <br>
-        Your payoff (the money you will earn from this experiment): {{ payout }}
+        Your payoff that round: {{ payout }}.
     </p>
 
     {% next_button %}
