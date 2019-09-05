@@ -12,6 +12,9 @@ class Voting(Page):
     form_fields = ['ran']
 
     def vars_for_template(self):
+        # distance to each other for this given round
+        self.player.participant.vars['distances'] = {d:
+            abs(self.player.candidate_number - d) for d in Constants.preferences}
         return {
             'candidate_number': self.player.candidate_number,
         }
@@ -24,19 +27,6 @@ class Voting(Page):
             self.player.ran = False
         if self.player.ran:
             self.player.preference = self.player.candidate_number
-        else:
-            d = self.player.participant.vars['distances'].copy()
-            del d[self.player.candidate_number]
-            closest = min(d.items(), key=lambda x: x[1])
-            del d[closest[0]]
-            second_closest = min(d.items(), key=lambda x: x[1])
-            self.player.preference = closest[0]
-            self.player.preference2 = None
-            if closest[1] == second_closest[1] and self.session.vars['second_round_toggle']:
-                self.player.preference2 = second_closest[0]
-            elif closest[1] == second_closest[1]:
-                if random.random() < 0.5:
-                    self.player.preference = second_closest[0]
 
 class ResultsWaitPage(WaitPage):
     def after_all_players_arrive(self):
@@ -46,13 +36,36 @@ class ResultsWaitPage(WaitPage):
         self.session.vars['second_round'] = False # boolean storing whether a second_round occurred
         self.session.vars['winner'] = None # candidate_number of the winner
         
-        # record who ran and count votes
+        # record who ran and count votes. Since counters only hold ints,
+        # we double the count of each vote
         for p in self.group.get_players():
             if p.ran:
                 self.session.vars['ran'].append(p.candidate_number)
-            votes[p.preference] += 1
+            else:
+                d = p.participant.vars['distances'].copy()
+                d.pop(p.candidate_number, None)
+                for pp in self.group.get_players():
+                    if not pp.ran:
+                        d.pop(pp.candidate_number, None)
+                # d is guaranteed to be non-empty here
+                closest = min(d.items(), key=lambda x: x[1])
+                d.pop(closest[0], None)
+                p.preference = closest[0]
+                p.preference2 = None
+                if d:
+                    second_closest = min(d.items(), key=lambda x: x[1])
+                else:
+                    second_closest = (None, None)
+                if closest[1] == second_closest[1] and self.round_number <= Constants.num_rounds_runoff:
+                    p.preference2 = second_closest[0]
+                elif closest[1] == second_closest[1]:
+                    if random.random() < 0.5:
+                        p.preference = second_closest[0]
             if p.preference2:
+                votes[p.preference] += 1
                 votes[p.preference2] += 1
+            else:
+                votes[p.preference] += 2
         
         # Create list of nominees
         # special case: everyone runs
@@ -66,20 +79,29 @@ class ResultsWaitPage(WaitPage):
         # 2-4 people run 
         else:
             first, second = votes.most_common(2)
-            for p in self.group.get_players():
-                if p.candidate_number == first[0]:
-                    self.session.vars['nominees'].append(p.candidate_number)
+            # add the highest voted person to nominees
+            self.session.vars['nominees'].append(first[0])
+            # if there is a tie, add the tie person to nominees
             if first[1] == second[1]:
-                for p in self.group.get_players():
-                    if p.candidate_number == second[0]:
-                        self.session.vars['nominees'].append(p.candidate_number)       
-        
+                self.session.vars['nominees'].append(second[0])       
+            # if runoffs are turned on, and the nominee did not get more than
+            # half of the vote, pick the second highest voted person as the
+            # second nominee, breaking ties randomly
+            elif self.round_number <= Constants.num_rounds_runoff and first[1] <= \
+                Constants.players_per_group:
+                votes_needed = second[1]
+                candidates = [c[0] for c in votes.most_common() \
+                    if c[1] == votes_needed]
+                # NOTE: do all candidates who received votes_needed votes get
+                # entered, or just the ones who also ran?
+                self.session.vars['nominees'].append(random.choice(candidates))
+
         # Determine winner
         # 1 nominee
         if len(self.session.vars['nominees']) == 1:
             self.session.vars['winner'] = self.session.vars['nominees'][0]
         # 2 nominees and second round
-        elif len(self.session.vars['nominees']) > 1 and self.session.vars['second_round_toggle']:
+        elif len(self.session.vars['nominees']) > 1 and self.round_number <= Constants.num_rounds_runoff:
             votes2 = collections.Counter()
             # each player votes again
             for p in self.group.get_players():

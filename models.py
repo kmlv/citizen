@@ -14,6 +14,7 @@ doc = """
 class Constants(BaseConstants):
     name_in_url = 'citizen'
     num_rounds = 10 # multiples of 5
+    num_rounds_runoff = 1
     players_per_group = 5
     preferences = [15, 30, 50, 70, 95]
 
@@ -29,13 +30,6 @@ class Subsession(BaseSubsession):
         for p in self.get_players():
             p.candidate_number = Constants.preferences[(self.round_number + \
                 p.id_in_group - 2) % 5] # your candidate number
-            # distance to each other for this given round
-            p.participant.vars['distances'] = {d:
-                abs(p.candidate_number - d) for d in Constants.preferences}
-        if self.round_number > 5:
-            self.session.vars['second_round_toggle'] = True
-        else:
-            self.session.vars['second_round_toggle'] = False
 
 class Group(BaseGroup):
     ran = models.StringField()

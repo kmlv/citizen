@@ -34,7 +34,8 @@ to 1, there will be 1 round of runoff then 9 rounds of non-runoff.
 1. To use the default config values shown above, simply click 'Candidate Citizen'
 and play the game.
 1. To configure your own config values and play a real session, click the
-'Sessions' link at the top left, then click 'Create new session'
+'Sessions' link at the top left.
+1. Username: admin. Password: slugtree. Then click 'Create new session'
 1. Select 'Candidate Citizen' as the session config. Enter your number of
 participants.
 1. Click 'Configure session'. Fill in the values you want for endowment, B,
