@@ -16,7 +16,7 @@ class Voting(Page):
             'candidate_number': self.player.candidate_number,
         }
 
-    timeout_seconds = 30
+    timeout_seconds = 60
 
     def before_next_page(self):
         # each player votes
@@ -104,10 +104,10 @@ class ResultsWaitPage(WaitPage):
                 self.session.vars['nominees'])
 
 class Results(Page):
-    timeout_seconds = 30
+    timeout_seconds = 60
  
     def vars_for_template(self):
-        round_payoff = self.session.config['endowment']
+        round_payoff = c(self.session.config['endowment'])
         if self.player.ran:
             round_payoff -= self.session.config['C']
             if self.player.candidate_number in self.session.vars['nominees'] and \
@@ -115,6 +115,7 @@ class Results(Page):
                 round_payoff -= self.session.config['D']
             if self.player.candidate_number == self.session.vars['winner']:
                 round_payoff += self.session.config['B']
+        round_payoff -= abs((self.player.candidate_number - self.session.vars['winner']) / 100.0)
         self.player.round_payoff = round_payoff
         if self.player.id_in_group == 1:
             self.group.nominees = str(self.session.vars['nominees'])
