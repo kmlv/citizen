@@ -14,7 +14,7 @@ doc = """
 class Constants(BaseConstants):
     name_in_url = 'citizen'
     num_rounds = 10 # multiples of 5
-    num_rounds_runoff = 1
+    num_rounds_runoff = 5 # n rounds of runoff mode on followed by num_rounds - n rounds of no runoff
     players_per_group = 5
     preferences = [15, 30, 50, 70, 95]
 

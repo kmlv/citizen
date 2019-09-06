@@ -11,10 +11,10 @@ SESSION_CONFIGS = [
         name='citizen',
         num_demo_participants=5,
         app_sequence=['citizen'],
-        endowment=50.0,
-        B=15.25,
-        C=7.5,
-        D=3.75,
+        endowment=10.0,
+        B=3.0,
+        C=1.5,
+        D=0.75,
     ),
  ]
  ```
