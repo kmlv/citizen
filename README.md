@@ -48,3 +48,32 @@ If you edit anything, and want to make sure you didn't break something
 accidentally, run `otree test citizen` from the `candicitizen` directory.
 It should not fail. Warnings are fine.
 
+# Brief git tutorial
+Git is a way for multiple people to collaborate on a project simultaneously.
+You need to know how to do 3 things: *clone*, *push*, and *pull*.
+
+### Clone
+`git clone https://github.com/kmlv/citizen.git` will create a copy of this
+repository, including the directory structure and all files, into a directory
+that gets automatically created and is called `citizen`. You should only need
+to do this once on your local machine.
+
+### Push
+This is how you take work you have done in the `citizen` repo on your local
+computer, and upload it to github.
+1. Change some files in the `citizen` repo.
+2. Into your terminal, type the command `git status`. It should show a list
+of files that have been edited. If there is any file on there that you did
+not edit, something is wrong.
+1. Into your terminal, type the command `git add -A`.
+1. Into your terminal, type the command `git commit -m "<message>", replacing
+<message> with a short message about what you changed.
+1. Into your terminal, type the command `git push origin master`
+
+### Pull
+This is how you take work that exists on github, and merge it into your copy
+of the repository on your local computer.
+
+Into your terminal, from inside the `citizen` directory,
+type `git pull origin master`. If you get any merge conflicts, talk to Eli.
+
