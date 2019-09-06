@@ -31,6 +31,8 @@ class Voting(Page):
 class ResultsWaitPage(WaitPage):
     def after_all_players_arrive(self):
         votes = collections.Counter() # data structure for holding votes
+        for p in Constants.preferences:
+            votes[p] = 0
         self.session.vars['ran'] = [] # list storing who ran
         self.session.vars['nominees'] = [] # list storing winners of first round
         self.session.vars['second_round'] = False # boolean storing whether a second_round occurred
@@ -41,31 +43,6 @@ class ResultsWaitPage(WaitPage):
         for p in self.group.get_players():
             if p.ran:
                 self.session.vars['ran'].append(p.candidate_number)
-            else:
-                d = p.participant.vars['distances'].copy()
-                d.pop(p.candidate_number, None)
-                for pp in self.group.get_players():
-                    if not pp.ran:
-                        d.pop(pp.candidate_number, None)
-                # d is guaranteed to be non-empty here
-                closest = min(d.items(), key=lambda x: x[1])
-                d.pop(closest[0], None)
-                p.preference = closest[0]
-                p.preference2 = None
-                if d:
-                    second_closest = min(d.items(), key=lambda x: x[1])
-                else:
-                    second_closest = (None, None)
-                if closest[1] == second_closest[1] and self.round_number <= Constants.num_rounds_runoff:
-                    p.preference2 = second_closest[0]
-                elif closest[1] == second_closest[1]:
-                    if random.random() < 0.5:
-                        p.preference = second_closest[0]
-            if p.preference2:
-                votes[p.preference] += 1
-                votes[p.preference2] += 1
-            else:
-                votes[p.preference] += 2
         
         # Create list of nominees
         # special case: everyone runs
@@ -76,8 +53,35 @@ class ResultsWaitPage(WaitPage):
         elif len(self.session.vars['ran']) == 0:
             self.session.vars['nominees'] = random.sample(
                 Constants.preferences, 1)
-        # 2-4 people run 
+        # 1-4 people run 
         else:
+            for p in self.group.get_players():
+                if not p.ran:
+                    d = p.participant.vars['distances'].copy()
+                    d.pop(p.candidate_number, None)
+                    for pp in self.group.get_players():
+                        if not pp.ran:
+                            d.pop(pp.candidate_number, None)
+                    # d is guaranteed to be non-empty here
+                    closest = min(d.items(), key=lambda x: x[1])
+                    d.pop(closest[0], None)
+                    p.preference = closest[0]
+                    p.preference2 = None
+                    if d:
+                        second_closest = min(d.items(), key=lambda x: x[1])
+                    else:
+                        second_closest = (None, None)
+                    if closest[1] == second_closest[1] and self.round_number <= Constants.num_rounds_runoff:
+                        p.preference2 = second_closest[0]
+                    elif closest[1] == second_closest[1]:
+                        if random.random() < 0.5:
+                            p.preference = second_closest[0]
+                if p.preference2:
+                    votes[p.preference] += 1
+                    votes[p.preference2] += 1
+                else:
+                    votes[p.preference] += 2
+            
             first, second = votes.most_common(2)
             # add the highest voted person to nominees
             self.session.vars['nominees'].append(first[0])
