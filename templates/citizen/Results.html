@@ -2,26 +2,26 @@
 {% load otree static %}
 
 {% block title %}
-    Results: Round {{ subsession.round_number }}
+    Resultados: Ronda {{ subsession.round_number }}
 {% endblock %}
 
 {% block content %}
     <p>
-        The results are in!
+        ¡Los resultados han sido procesados!
         <br>
-        Your candidate number: {{ player.candidate_number }}
+        El número de tu preferencia fue: {{ player.candidate_number }}
         <br>
-        Candidates who ran: {{ ran }}.
+        Candidatos que participaron en elecciones fueron: {{ ran }}.
         <br>
-        Winner(s) of the first round of voting: {{ nominees }}.
+        Ganador(es) de la primera ronda de votacion: {{ nominees }}.
         <br>
         {% if second_round %}
-        There was a tie, and voting progressed to the second round.
+        Hubo un empate, la votación pasó a segunda vuelta.
         <br>
-        Winner of the second round: {{ winner }}.
+        Ganador de la segunda vuelta: {{ winner }}.
         <br>
         {% endif %}
-        Your payoff this round: {{ round_payoff|c }}.
+        Tu pago en esta ronda fue: {{ round_payoff|c }}.
         <br>
     </p>
     {% next_button %}

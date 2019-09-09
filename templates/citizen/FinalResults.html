@@ -2,15 +2,15 @@
 {% load otree static %}
 
 {% block title %}
-    Final Results
+    Resultados Finales: Pagos
 {% endblock %}
 
 {% block content %}
 
     <p>
-        Your randomly chosen paying round: {{ chosen_round }}.
+        La ronda elegida al azar que se te pagará es: {{ chosen_round }}.
         <br>
-        Your payoff that round: {{ payout }}.
+        Tu pago en esa ronda fue: {{ payout }}.
     </p>
 
     {% next_button %}

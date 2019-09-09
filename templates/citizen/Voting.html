@@ -2,16 +2,16 @@
 {% load otree static %}
 
 {% block title %}
-    Voting: Round {{ subsession.round_number }}
+    Votaciones: Ronda {{ subsession.round_number }}
 {% endblock %}
 
 {% block content %}
     <p>
-        These are some instructions.
+        Esté atento a las instrucciones del encargado.
         <br>
-        Your candidate number is {{ candidate_number }}.
+        Su preferencia en esta ronda está dada por el número: {{ candidate_number }}.
         <br>
-        Would you like to run in the election?
+        ¿Le gustaría participar en las elecciones de esta ronda?
         <br>
     </p>
     {% formfield player.ran %}
